@@ -1,0 +1,21 @@
+[project]
+name = "llm-core-smoke"
+version = "0.1.0"
+description = "core-smoke: smoke de publicación de llm-dev-core v1.0.0 — importa los 9 paquetes públicos del core publicado y falla si alguno no carga (semana 13)."
+requires-python = ">=3.12"
+dependencies = [
+    "llm-dev-core>=1.0.0",
+]
+
+[project.scripts]
+core-smoke = "core_smoke.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/core_smoke"]
+
+[dependency-groups]
+dev = ["pytest>=8,<9"]

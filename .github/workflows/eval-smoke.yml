@@ -1,0 +1,20 @@
+name: core-smoke
+'on':
+  pull_request: null
+  push:
+    branches:
+    - main
+jobs:
+  core-smoke:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: astral-sh/setup-uv@v6
+    - name: core publicado desde PyPI (sin path editable — este job ES el smoke del release)
+      run: uv sync --frozen
+    - name: la dist instalada es la publicada (serie 1.x y dentro de site-packages)
+      run: uv run python -c "import importlib.metadata as md, pathlib, schema_validate; v = md.version('llm-dev-core'); loc = pathlib.Path(schema_validate.__file__).resolve(); print('llm-dev-core', v, '·', loc); assert v.split('.')[0] == '1', v; assert 'site-packages' in loc.parts, loc"
+    - name: evals en verde (replay determinista, sin LLM — D4)
+      run: uv run pytest tests/test_replay.py -q
+    - name: suite completa (stub) + import de los 9 paquetes públicos
+      run: uv run pytest -q

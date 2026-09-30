@@ -1,0 +1,23 @@
+# Manifest del consumidor. Contrato e inventario a la vez (ARCHITECTURE.md §2.1).
+week: 13
+name: core-smoke
+core_version: 1.0.0
+
+reused_modules:
+  - llm-client
+  - schema-validate
+  - secure-base
+  - test-kit
+  - cache-ratelimit
+  - ci-pack
+
+new_surface:
+  - "check: importa los 9 paquetes públicos del core instalado y falla (exit 1) si alguno no carga o la versión no es 1.x"
+  - "el veredicto de salud sale del LLM pero solo se muestra si schema-validate lo aprueba (core-health-v1)"
+  - "prompt core-health-generator nacido evaluado con dataset congelado"
+  - "smoke de publicación: instala llm-dev-core>=1.0.0 desde PyPI, no el árbol de trabajo"
+
+estimated_new_surface: 12
+
+# Presupuesto máximo de evals en USD por semana (ARCHITECTURE.md §8.1).
+eval_budget_usd: 2.0
