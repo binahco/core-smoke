@@ -28,7 +28,8 @@ DEFAULT_PROMPT = PROMPT_DIR / "core-health-generator.md"
 DEFAULT_DATASET = ROOT / "evals" / "core-health.jsonl"
 TTL_DAILY = 86400.0
 
-# Superficie pública de la dist (D1): los 9 paquetes top-level que un consumidor puede usar.
+# Superficie pública de la dist (D1): los paquetes top-level que un consumidor puede usar.
+# El conteo cambia con el calendario C1-C18: no se pinea (lección F3).
 PUBLIC_MODULES = (
     "llm_client",
     "schema_validate",
@@ -39,6 +40,8 @@ PUBLIC_MODULES = (
     "cache_ratelimit",
     "bot_base",
     "parser_io",
+    "diff_engine",
+    "agent_loop",
 )
 EXPECTED_MAJOR = "1"
 

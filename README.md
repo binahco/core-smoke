@@ -22,7 +22,7 @@ uv run core-smoke check
 #   ok  bot_base         importado
 #   ok  parser_io        importado
 # dist llm-dev-core==1.0.0 · mayor esperado 1.x · ok
-# veredicto (core-health-v1): El release 1.0.0 cumple su contrato: los 9 paquetes
+# veredicto (core-health-v1): El release publicado cumple su contrato: los paquetes
 #   públicos importan correctamente desde la distribución publicada.
 # smoke: OK — los paquetes públicos del core publicado cargan
 ```
@@ -40,7 +40,7 @@ uv run core-smoke replay-check   # dataset congelado contra el cassette 1/1
 
 ```
 core-smoke check
-  ├─ import_packages()          # el gate real: import de los 9 paquetes públicos
+  ├─ import_packages()          # el gate real: import de los paquetes públicos (el conteo cambia: PUBLIC_MODULES en src)
   ├─ installed_version()        # importlib.metadata sobre la dist instalada
   ├─ exit code                  # 1 si algún import falla o la versión no es 1.x
   └─ client.complete(core-health-generator)  # veredicto narrativo, sanitizado
@@ -69,8 +69,10 @@ core-smoke check
 
 - Solo verifica **carga de módulos y versión**. No llama a la API real de cada módulo
   (`llm_client.complete`, `ci_pack.collect`, …): es un smoke de empaquetado, no una suite
-  funcional. La suite funcional del core son sus propios 107 tests, y el compat check
-  (§6.1) es lo que cubre a los consumidores.
+  funcional. La suite funcional del core son sus propios tests (`make validate` en
+  `llm-dev-core`), y el compat check (§6.1) es lo que cubre a los consumidores.
+  El número exacto cambia con el trabajo en curso; el comando que lo produce es la
+  cifra, no el número.
 - El CI no puede ejecutar `core-smoke check` porque el comando real llama al LLM; en CI
   corre el replay del dataset (`pytest tests/test_replay.py`) más la suite con stub.
 - `EXPECTED_MAJOR = "1"`: cuando salga el v2.0 hay que subir esta constante y el pin del

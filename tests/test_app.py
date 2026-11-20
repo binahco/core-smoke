@@ -26,10 +26,10 @@ from test_kit import EvalDataset, run as run_evalset
 
 STUB_TEXT = json.dumps(
     {
-        "version": "1.0.0",
+        "version": "1.3.0",
         "packages_ok": True,
         "verdict": "el release publicado sirve su contrato público",
-        "notes": ["9/9 paquetes importan desde el wheel"],
+        "notes": ["todos los paquetes importan desde el wheel"],
     }
 )
 
@@ -95,7 +95,7 @@ def test_manifiesto_pide_la_dist_publicada_y_no_un_path_local() -> None:
 
     data = tomllib.loads((Path(__file__).resolve().parents[1] / "pyproject.toml").read_text())
     deps = data["project"]["dependencies"]
-    assert any(d.startswith("llm-dev-core>=1.0.0") for d in deps), deps
+    assert any(d.startswith("llm-dev-core>=1.3.0") for d in deps), deps
     uv_sources = data.get("tool", {}).get("uv", {}).get("sources")
     assert not uv_sources, f"core-smoke no debe apuntar a un checkout local: {uv_sources}"
 
@@ -139,8 +139,9 @@ def test_check_falla_si_la_version_no_es_1x(monkeypatch: pytest.MonkeyPatch) -> 
 def test_inventario_panel_marca_los_fallos() -> None:
     packages = import_packages()
     roto = [*packages[:-1], PackageHealth(module="parser_io", ok=False, detail="ModuleNotFoundError: sin wheel")]
-    panel = inventory_panel(roto, "1.0.0")
-    assert "- dist llm-dev-core==1.0.0 · 8/9 paquetes importan" in panel
+    panel = inventory_panel(roto, "1.3.0")
+    esperado = f"- dist llm-dev-core==1.3.0 · {len(roto) - 1}/{len(roto)} paquetes importan"
+    assert esperado in panel
     assert "parser_io: FALLA (ModuleNotFoundError: sin wheel)" in panel
 
 
@@ -150,8 +151,8 @@ def test_prompt_llega_sanitizado_al_proveedor() -> None:
     assert provider.calls == 1
     messages = provider.last_request.messages
     assert "Fecha: 2026-10-08" in messages[-1]["content"]
-    assert "llm-dev-core==1.0.0" in messages[-1]["content"]
-    assert "9/9 paquetes importan" in messages[-1]["content"]
+    assert "llm-dev-core" in messages[-1]["content"] and "versión instalada: 1.3.0" in messages[-1]["content"]
+    assert f"paquetes públicos: {len(import_packages())}" in messages[-1]["content"]
 
 
 def test_salida_invalida_aborta_con_error_de_schema() -> None:
@@ -175,5 +176,5 @@ def test_health_request_tags_y_schema() -> None:
     assert request.response_schema == "core-health-v1"
     assert request.prompt_id == "core-health-generator"
     assert request.tags == ["core-smoke", "week-13"]
-    assert request.variables["modulos"] == "9"
+    assert request.variables["modulos"] == str(len(import_packages()))
     assert request.variables["dist"] == "llm-dev-core"
